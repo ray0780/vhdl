@@ -1,0 +1,65 @@
+LIBRARY ieee;
+USE ieee.std_logic_1164.all;
+ENTITY counter IS
+	PORT
+	(
+		S, R, Enable : IN STD_LOGIC ;
+		re : IN STD_LOGIC ;
+		OnLed: OUT STD_LOGIC;
+		seven_0, seven_1; OUT STD_LOGIC_VECTOR(7 downto 0)
+	);
+
+END counter;
+
+ARCHITECTURE a OF counter IS
+	SIGNAL Q,nQ : STD_LOGIC; 
+	SIGNAL digit0, digit1: INTEGER RANGE 0 to 10;
+BEGIN
+	Q <= ((not S) NAND Enable) NAND nQ;
+	nQ <= ((not R) NAND Enable) NAND Q;
+	OnLed <= Q ;
+
+  pro0: PROCESS(Q,nQ,re)
+  BEGIN
+	IF (re = '0' and Enable = '1')
+	  digit0 <= 0;
+	  digit1 <= 0;
+  	ELSEIF (Q'EVENT and Q ='1') THEN 
+		digit0 <= digit0 + 1;
+		IF(digit0 >= 9) THEN
+			digit1 <= digit1 + 1;
+			digit0 <= 0;
+			IF(digit1>=9) THEN 
+				digit1 <= 0;
+			END IF;
+		END IF;
+	END IF;
+  CASE digit0 IS
+	WHEN 0  => seven_0  <= "00000011";
+	WHEN 1  => seven_0  <= "10011111";
+	WHEN 2  => seven_0  <= "00100101";
+	WHEN 3  => seven_0  <= "00001101";
+	WHEN 4  => seven_0  <= "10011001";
+	WHEN 5  => seven_0  <= "01001001";
+	WHEN 6  => seven_0  <= "11000001";
+	WHEN 7  => seven_0  <= "00011111";
+	WHEN 8  => seven_0  <= "00000001";
+	WHEN 9  => seven_0  <= "00011001";
+  END CASE;
+  
+  CASE digit1 IS
+	WHEN 0  => seven_1  <= "00000011";
+	WHEN 1  => seven_1  <= "10011111";
+	WHEN 2  => seven_1  <= "00100101";
+	WHEN 3  => seven_1  <= "00001101";
+	WHEN 4  => seven_1  <= "10011001";
+	WHEN 5  => seven_1  <= "01001001";
+	WHEN 6  => seven_1  <= "11000001";
+	WHEN 7  => seven_1  <= "00011111";
+	WHEN 8  => seven_1  <= "00000001";
+	WHEN 9  => seven_1  <= "00011001";
+  END CASE;
+	
+  END PROCESS pro0;
+
+END a;
